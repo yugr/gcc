@@ -1179,7 +1179,7 @@ See RS/6000 and PowerPC Options.
 -msse2avx -mfentry -mrecord-mcount -mnop-mcount -m8bit-idiv @gol
 -mavx256-split-unaligned-load -mavx256-split-unaligned-store @gol
 -malign-data=@var{type} -mstack-protector-guard=@var{guard} @gol
--mmitigate-rop -mgeneral-regs-only}
+-mmitigate-rop -mgeneral-regs-only -mcopy-reloc}
 
 @emph{x86 Windows Options}
 @gccoptlist{-mconsole -mcygwin -mno-cygwin -mdll @gol
@@ -24652,6 +24652,11 @@ on to provide serious protection.
 Generate code that uses only the general-purpose registers.  This
 prevents the compiler from using floating-point, vector, mask and bound
 registers.
+
+@item -mcopy-reloc
+@opindex mcopy-reloc
+Generate code that uses copy relocation in executable to access external
+data defined in shared object.  It is enabled by default.
 
 @end table
 
