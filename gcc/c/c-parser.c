@@ -7407,6 +7407,7 @@ c_parser_generic_selection (c_parser *parser)
      __builtin_shuffle ( assignment-expression , 
 			 assignment-expression ,
 			 assignment-expression, )
+    __builtin_has_side_effects_p ( assignment-expression )
 
    offsetof-member-designator:
      identifier
@@ -7990,6 +7991,29 @@ c_parser_postfix_expression (c_parser *parser)
 	    set_c_expr_source_range (&expr, loc, close_paren_loc);
 	    break;
 	  }
+	case RID_HAS_SIDE_EFFECTS_P:
+	  c_parser_consume_token (parser);
+	  if (!c_parser_require (parser, CPP_OPEN_PAREN, "expected %<(%>"))
+	    {
+	      expr.set_error ();
+	      break;
+	    }
+	  {
+	    c_expr ce = c_parser_expression (parser);
+	    location_t close_paren_loc = c_parser_peek_token (parser)->location;
+	    c_parser_skip_until_found (parser, CPP_CLOSE_PAREN,
+				       "expected %<)%>");
+	    if (ce.value == error_mark_node)
+	      {
+		expr.set_error ();
+		break;
+	      }
+
+	    expr.value
+	      = TREE_SIDE_EFFECTS(ce.value) ? integer_one_node : integer_zero_node;
+	    set_c_expr_source_range (&expr, loc, close_paren_loc);
+	  }
+	  break;
 	case RID_AT_SELECTOR:
 	  gcc_assert (c_dialect_objc ());
 	  c_parser_consume_token (parser);

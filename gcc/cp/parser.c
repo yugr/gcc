@@ -4675,6 +4675,7 @@ cp_parser_fold_expression (cp_parser *parser, tree expr1)
      ( compound-statement )
      __builtin_va_arg ( assignment-expression , type-id )
      __builtin_offsetof ( type-id , offsetof-expression )
+     __builtin_has_side_effects_p ( assignment-expression )
 
    C++ Extensions:
      __has_nothrow_assign ( type-id )   
@@ -5061,6 +5062,28 @@ cp_parser_primary_expression (cp_parser *parser,
 	    location_t combined_loc
 	      = make_location (type_location, start_loc, finish_loc);
 	    return build_x_va_arg (combined_loc, expression, type);
+	  }
+
+	case RID_HAS_SIDE_EFFECTS_P:
+	  {
+	    location_t start_loc
+	      = cp_lexer_peek_token (parser->lexer)->location;
+	    cp_lexer_consume_token (parser->lexer);
+	    cp_parser_require (parser, CPP_OPEN_PAREN, RT_OPEN_PAREN);
+
+	    location_t expr_loc
+	      = cp_lexer_peek_token (parser->lexer)->location;
+	    tree expr = cp_parser_assignment_expression (parser);
+
+	    location_t finish_loc
+	      = cp_lexer_peek_token (parser->lexer)->location;
+	    cp_parser_require (parser, CPP_CLOSE_PAREN, RT_CLOSE_PAREN);
+	    location_t combined_loc
+	      = make_location (expr_loc, start_loc, finish_loc);
+
+	    tree res
+	      = TREE_SIDE_EFFECTS(expr) ? integer_one_node : integer_zero_node;
+	    return cp_expr (res, combined_loc);
 	  }
 
 	case RID_OFFSETOF:
